@@ -1,29 +1,21 @@
+from twitchio.ext import commands
 import google.generativeai as genai
 
+# Configuração da API e modelo Gemini
 genai.configure(api_key="AIzaSyCIOfbNjiak6d7UqO0uZ2c1p9Zd93jgRIo")
+model = genai.GenerativeModel('gemini-1.5-pro-latest')
+chat_gemini = model.start_chat(history=[])
 
-for m in genai.list_models():
-    if 'generateContent' in m.supported_generation_methods:
-        print(m.name)
+# Classe do bot
+class Bot(commands.Bot):
 
-model = genai.GenerativeModel('gemini-pro')
+    def __init__(self):
+        super().__init__(token='4wf7psvn2ybepybbksw5vs6zv7cldh', prefix='!', initial_channels=['friendfyre'])
 
-chat = model.start_chat(history=[])
+    @commands.command(name='gemini')
+    async def gemini_command(self, ctx, *, mensagem):
+        response = chat_gemini.send_message(mensagem)
+        await ctx.send(f"Gemini: {response.text}")
 
-bem_vindo = "# Bem Vindo ao Assistente Mil Grau com Gemini AI #"
-print(len(bem_vindo) * "#")
-print(bem_vindo)
-print(len(bem_vindo) * "#")
-print("###   Digite 'sair' para encerrar    ###")
-print("")
-
-while True:
-    texto = input("Escreva sua mensagem: ")
-
-    if texto == "sair":
-        break
-
-    response = chat.send_message(texto)
-    print("Gemini:", response.text, "\n")
-
-print("Encerrando Chat")
+bot = Bot()
+bot.run()
